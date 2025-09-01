@@ -18,7 +18,7 @@ app.use(express.json());
 app.use('/api/movies', require('./routes/movies'));
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     message: 'Backend funcionando',
