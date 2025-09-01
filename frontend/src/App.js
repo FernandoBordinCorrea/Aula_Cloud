@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 
+console.log(process.env.REACT_APP_API_URL);
+
 // Configuração dinâmica para API base
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://192.168.94.131:5000/api';
 
