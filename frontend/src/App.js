@@ -48,33 +48,19 @@ function App() {
 
   // Buscar filmes
   const searchMovies = async (query) => {
-    if (!query) return;
-    
-    if (backendStatus === 'offline') {
-      await checkBackendStatus();
-      if (backendStatus === 'offline') return;
-    }
-    
-    setLoading(true);
-    setError('');
-    
-    try {
-      const response = await api.get('/movies/search', {
-        params: { query }
-      });
-      
-      if (response.data.Search) {
+
+    // Buscar filmes via proxy Nginx
+  try {
+    const response = await api.get('/movies/proxy/omdb', {
+      params: { s: query }
+    });
+    if (response.data.Search) {
         setMovies(response.data.Search);
       }
-    } catch (err) {
-      setError(err.response?.data?.error || 'Erro ao buscar filmes');
-      if (err.response?.status === 0 || err.code === 'ECONNREFUSED') {
-        setBackendStatus('offline');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (error) {
+    console.error('Erro ao buscar filmes:', error);
+  }
+};
 
   // Carregar filmes favoritos
   const loadFavorites = async () => {
