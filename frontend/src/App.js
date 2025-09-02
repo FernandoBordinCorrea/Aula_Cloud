@@ -48,33 +48,47 @@ function App() {
 
   // Buscar filmes
   const searchMovies = async (query) => {
-    if (!query) return;
+  if (!query) return;
+  
+  if (backendStatus === 'offline') {
+    await checkBackendStatus();
+    if (backendStatus === 'offline') return;
+  }
+  
+  setLoading(true);
+  setError('');
+  
+  try {
+    // USAR O PROXY NO BACKEND
+    const response = await api.get('/api/movies/proxy/omdb', {
+      params: { s: query }
+    });
     
-    if (backendStatus === 'offline') {
-      await checkBackendStatus();
-      if (backendStatus === 'offline') return;
+    if (response.data.Search) {
+      setMovies(response.data.Search);
     }
-    
-    setLoading(true);
-    setError('');
-    
-    try {
-      const response = await api.get('/movies/search', {
-        params: { query }
-      });
-      
-      if (response.data.Search) {
-        setMovies(response.data.Search);
-      }
-    } catch (err) {
-      setError(err.response?.data?.error || 'Erro ao buscar filmes');
-      if (err.response?.status === 0 || err.code === 'ECONNREFUSED') {
-        setBackendStatus('offline');
-      }
-    } finally {
-      setLoading(false);
+  } catch (err) {
+    setError(err.response?.data?.error || 'Erro ao buscar filmes');
+    if (err.response?.status === 0 || err.code === 'ECONNREFUSED') {
+      setBackendStatus('offline');
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
+
+// ADICIONAR FUNÇÃO PARA BUSCAR DETALHES:
+const getMovieDetails = async (imdbID) => {
+  try {
+    const response = await api.get('/api/movies/proxy/omdb', {
+      params: { i: imdbID }
+    });
+    return response.data;
+  } catch (err) {
+    console.error('Erro ao buscar detalhes:', err);
+    return null;
+  }
+};
 
   // Carregar filmes favoritos
   const loadFavorites = async () => {
